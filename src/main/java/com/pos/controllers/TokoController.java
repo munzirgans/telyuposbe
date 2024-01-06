@@ -7,6 +7,7 @@ package com.pos.controllers;
 import com.pos.models.entities.Toko;
 import com.pos.models.responses.ResponseJSON;
 import com.pos.services.TokoServices;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,7 +34,12 @@ public class TokoController {
     
     @PutMapping
     public ResponseEntity<ResponseJSON> updateToko(@RequestBody Toko toko){
-        
+        Toko store = tokoServices.update(toko);
+        if(store != null){
+            return ResponseEntity.ok(new ResponseJSON("Berhasil update data!"));
+        }else{
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseJSON("Bermasalah pada server!"));
+        }
     }
     
     

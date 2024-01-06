@@ -66,10 +66,18 @@ public class ProductServices {
     public Products updateStock(Long id, int stock){
         Products product = productRepo.findById(id).orElse(null);
         if(product != null){
-            product.setStock(stock);
+            product.setStock(product.getStock() + stock);
             productRepo.save(product);
         }
         return product;
         
+    }
+    
+    public Products getProductByBarcode(String barcode){
+        return productRepo.findByBarcode(barcode);
+    }
+    
+    public Long getCountProducts(){
+        return productRepo.count();
     }
 }

@@ -4,9 +4,13 @@
  */
 package com.pos.controllers;
 
+import com.pos.models.entities.IncomingReport;
 import com.pos.models.entities.Products;
 import com.pos.models.responses.ResponseJSON;
+import com.pos.services.IncomingReportServices;
 import com.pos.services.ProductServices;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +31,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/products")
 public class ProductController {
     private final ProductServices productService;
+    private final IncomingReportServices incomingReportServices;
 
-    public ProductController(ProductServices productService) {
+    public ProductController(ProductServices productService, IncomingReportServices incomingReportServices) {
         this.productService = productService;
+        this.incomingReportServices = incomingReportServices;
     }
 
     @GetMapping("/{id}")
@@ -43,7 +49,16 @@ public class ProductController {
     
     @PostMapping
     public Products save(@RequestBody Products products){
-        return productService.save(products);
+        Products product = productService.save(products);
+        IncomingReport incomingReport = new IncomingReport();
+        incomingReport.setBarcode(product.getBarcode());
+        incomingReport.setName(product.getName());
+        incomingReport.setQuantity(products.getStock());
+        incomingReport.setDate(LocalDate.now());
+        incomingReport.setTime(LocalTime.now());
+        incomingReport.setVia("Add Product");
+        incomingReportServices.save(incomingReport);
+        return product;
     }
     
     @PutMapping("/{id}")
@@ -54,7 +69,7 @@ public class ProductController {
         }else{
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseJSON("Ada yang bermasalah pada internal server error!"));
         }
-    }
+        }
     
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseJSON> delete(@PathVariable Long id){
@@ -69,10 +84,23 @@ public class ProductController {
     @PutMapping("/stock/{id}")
     public ResponseEntity<Products> updateStock(@PathVariable Long id, @RequestBody Products products){
         Products product = productService.updateStock(id,products.getStock());
-        if(product != null){
-            return ResponseEntity.ok(product);
+        if(product == null){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        IncomingReport incomingReport = new IncomingReport();
+        incomingReport.setBarcode(product.getBarcode());
+        incomingReport.setName(product.getName());
+        incomingReport.setQuantity(products.getStock());
+        incomingReport.setDate(LocalDate.now());
+        incomingReport.setTime(LocalTime.now());
+        incomingReport.setVia("Add Stock");
+        incomingReportServices.save(incomingReport);
+        return ResponseEntity.ok(product);
+    }
+    
+    @PostMapping("/barcode")
+    public Products getProductByBarcode(@RequestBody Products products){
+        return productService.getProductByBarcode(products.getBarcode());
     }
 }
 

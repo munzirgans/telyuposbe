@@ -4,15 +4,13 @@
  */
 package com.pos.models.repos;
 
-import com.pos.models.entities.Products;
+import com.pos.models.entities.IncomingReport;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  *
  * @author Asus
  */
-public interface ProductRepo extends JpaRepository<Products, Long> {
-    Products findByBarcode(String barcode);
-    @Override
-    long count();
+public interface IncomingReportRepo extends JpaRepository<IncomingReport, Long>{
+    
 }

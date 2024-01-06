@@ -27,7 +27,6 @@ public class TokoServices {
             newToko.setName("Telyu POS");
             newToko.setPhone("08123456789");
             newToko.setAddress("Jl. Raya Bojongsoang");
-            newToko.setPhoto("telyu.png");
             toko = tokoRepo.save(newToko);
         }
         return toko;
@@ -39,7 +38,6 @@ public class TokoServices {
             store.setName(toko.getName());
             store.setPhone(toko.getPhone());
             store.setAddress(toko.getAddress());
-            store.setPhoto(toko.getPhoto());
             tokoRepo.save(store);
             return store;
         }
